@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Is It Friday Yet?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.5s ease;
+        }
+        
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 90%;
+        }
+        
+        h1 {
+            font-size: 6rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .message {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: #333;
+            min-height: 60px;
+        }
+        
+        .emoji {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-container {
+            background: #e0e0e0;
+            border-radius: 50px;
+            height: 30px;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            border-radius: 50px;
+            transition: width 1s ease, background-color 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .progress-text {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        
+        .day-name {
+            font-size: 2rem;
+            color: #555;
+            margin-bottom: 1rem;
+        }
+        
+        /* Day-specific styles */
+        .monday { background: linear-gradient(135deg, #2c3e50, #34495e); }
+        .monday h1 { color: #95a5a6; }
+        
+        .tuesday { background: linear-gradient(135deg, #8e44ad, #9b59b6); }
+        .tuesday h1 { color: #8e44ad; }
+        
+        .wednesday { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .wednesday h1 { color: #e67e22; }
+        
+        .thursday { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .thursday h1 { color: #2980b9; }
+        
+        .friday { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+        .friday h1 { color: #27ae60; animation: pulse 1s infinite; }
+        
+        .weekend { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .weekend h1 { color: #e74c3c; animation: bounce 1s infinite; }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="emoji" id="emoji">😅</div>
+        <div class="day-name" id="dayName">Loading...</div>
+        <h1 id="answer">...</h1>
+        <div class="message" id="message">Checking the calendar...</div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar" style="width: 0%">0%</div>
+        </div>
+        <div class="progress-text" id="progressText">Distance to Friday</div>
+        
+        <div class="footer">
+            Made with 😂 by Clawdonis
+        </div>
+    </div>
+
+    <script>
+        const dayData = {
+            0: { // Sunday
+                name: "Sunday",
+                answer: "NO",
+                message: "It's Sunday! The weekend is still happening. Don't think about Monday yet. 🎉",
+                emoji: "😎",
+                progress: 0,
+                class: "weekend",
+                barColor: "#e74c3c"
+            },
+            1: { // Monday
+                name: "Monday",
+                answer: "NO",
+                message: "It's Monday. Why are you even asking? The week just started. ☕💀",
+                emoji: "😭",
+                progress: 0,
+                class: "monday",
+                barColor: "#95a5a6"
+            },
+            2: { // Tuesday
+                name: "Tuesday",
+                answer: "NO",
+                message: "Tuesday. The week is actually happening. Still so far to go. 😩",
+                emoji: "😫",
+                progress: 25,
+                class: "tuesday",
+                barColor: "#9b59b6"
+            },
+            3: { // Wednesday
+                name: "Wednesday",
+                answer: "NO",
+                message: "Hump Day! You're halfway there. Still not Friday though. 🐪",
+                emoji: "🐪",
+                progress: 50,
+                class: "wednesday",
+                barColor: "#e67e22"
+            },
+            4: { // Thursday
+                name: "Thursday",
+                answer: "NO",
+                message: "Almost Friday! You can smell it. Hang in there! 🏃‍♂️",
+                emoji: "👀",
+                progress: 75,
+                class: "thursday",
+                barColor: "#2980b9"
+            },
+            5: { // Friday
+                name: "Friday",
+                answer: "YES!!!",
+                message: "IT'S FRIDAY! Time to log off and live your life! 🎉🍻💃",
+                emoji: "🎉",
+                progress: 100,
+                class: "friday",
+                barColor: "#2ecc71"
+            },
+            6: { // Saturday
+                name: "Saturday",
+                answer: "NO",
+                message: "It's Saturday! It's the WEEKEND! Stop thinking about Fridays! 🌟",
+                emoji: "🥳",
+                progress: 0,
+                class: "weekend",
+                barColor: "#e74c3c"
+            }
+        };
+
+        const today = new Date().getDay();
+        const data = dayData[today];
+
+        // Apply styling
+        document.body.className = data.class;
+        document.getElementById('answer').textContent = data.answer;
+        document.getElementById('message').textContent = data.message;
+        document.getElementById('emoji').textContent = data.emoji;
+        document.getElementById('dayName').textContent = `Today is ${data.name}`;
+        
+        // Animate progress bar
+        setTimeout(() => {
+            const bar = document.getElementById('progressBar');
+            bar.style.width = `${data.progress}%`;
+            bar.style.backgroundColor = data.barColor;
+            bar.textContent = `${data.progress}%`;
+        }, 300);
+
+        // Update progress text
+        if (today === 5) {
+            document.getElementById('progressText').textContent = "Mission accomplished!";
+        } else if (today === 0 || today === 6) {
+            document.getElementById('progressText').textContent = "It's the weekend, enjoy!";
+        } else {
+            document.getElementById('progressText').textContent = `${100 - data.progress}% to go until Friday`;
+        }
+    </script>
+</body>
+</html>
